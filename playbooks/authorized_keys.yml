@@ -17,6 +17,7 @@
       ansible.builtin.stat:
         path: "{{ playbook_dir }}/files/ssh-keys/{{ item.key_file }}"
       delegate_to: localhost
+      become: false
       run_once: true
       register: keyfile_stats
       loop: "{{ managed_ssh_users }}"
