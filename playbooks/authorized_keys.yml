@@ -1,0 +1,44 @@
+---
+- name: Ensure SSH users, keys and sudo
+  hosts: known
+  become: true
+
+  tasks:
+    - name: Ensure requested users exist
+      ansible.builtin.user:
+        name: "{{ item.name }}"
+        state: present
+        shell: "{{ item.shell | default(/bin/bash) }}"
+        create_home: true
+      loop: "{{ managed_ssh_users }}"
+      when: item.create_user | default(true)
+
+    - name: Check whether SSH public key files exist on the controller
+      ansible.builtin.stat:
+        path: "{{ playbook_dir }}/files/ssh-keys/{{ item.key_file }}"
+      delegate_to: localhost
+      run_once: true
+      register: keyfile_stats
+      loop: "{{ managed_ssh_users }}"
+      loop_control:
+        label: "{{ item.name }}"
+
+    - name: Install SSH public keys that exist
+      ansible.posix.authorized_key:
+        user: "{{ item.item.name }}"
+        key: "{{ lookup(file, playbook_dir ~ /files/ssh-keys/ ~ item.item.key_file) }}"
+        state: present
+        manage_dir: true
+      loop: "{{ keyfile_stats.results }}"
+      when: item.stat.exists
+
+    - name: Allow passwordless sudo for managed users
+      ansible.builtin.copy:
+        dest: "/etc/sudoers.d/{{ item.name }}"
+        content: "{{ item.name }} ALL=(ALL) NOPASSWD:ALL\n"
+        owner: root
+        group: root
+        mode: "0440"
+        validate: "/usr/sbin/visudo -cf %s"
+      loop: "{{ managed_ssh_users }}"
+      when: item.passwordless_sudo | default(false)

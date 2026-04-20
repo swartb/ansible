@@ -1,0 +1,20 @@
+---
+- name: Bootstrap Ansible management key
+  hosts: known
+  become: true
+
+  tasks:
+    - name: Ensure Ansible management public key file exists on controller
+      ansible.builtin.stat:
+        path: "{{ playbook_dir }}/files/ssh-keys/{{ ansible_management_key_file }}"
+      delegate_to: localhost
+      run_once: true
+      register: mgmt_key
+
+    - name: Install Ansible management key for bart
+      ansible.posix.authorized_key:
+        user: bart
+        key: "{{ lookup(file, playbook_dir ~ /files/ssh-keys/ ~ ansible_management_key_file) }}"
+        state: present
+        manage_dir: true
+      when: mgmt_key.stat.exists

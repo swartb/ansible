@@ -1,0 +1,8 @@
+managed_ssh_users:
+  - name: bart
+    create_user: true
+    shell: /bin/bash
+    key_file: ansible_management.pub
+    passwordless_sudo: true
+
+ansible_management_key_file: ansible_management.pub
