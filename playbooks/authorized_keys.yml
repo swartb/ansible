@@ -8,7 +8,7 @@
       ansible.builtin.user:
         name: "{{ item.name }}"
         state: present
-        shell: "{{ item.shell | default(/bin/bash) }}"
+        shell: "{{ item.shell | default('/bin/bash') }}"
         create_home: true
       loop: "{{ managed_ssh_users }}"
       when: item.create_user | default(true)
