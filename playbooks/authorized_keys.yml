@@ -34,6 +34,7 @@
       loop:
         - bart
         - jane
+      when: ansible_system != "Darwin"
 
     - name: Zorg dat .ssh map bestaat voor root
       ansible.builtin.file:
@@ -42,6 +43,7 @@
         owner: root
         group: root
         mode: "0700"
+      when: ansible_system != "Darwin"
 
     - name: Voeg alle public keys toe voor bart, jane en root
       ansible.posix.authorized_key:
@@ -50,6 +52,7 @@
         key: "{{ lookup('ansible.builtin.file', item.1) }}"
         manage_dir: false
       loop: "{{ managed_users | product(public_key_files) | list }}"
+      when: ansible_system != "Darwin"
 
     - name: Sta passwordless sudo toe voor bart en jane
       ansible.builtin.copy:
@@ -60,3 +63,6 @@
         mode: "0440"
         validate: "/usr/sbin/visudo -cf %s"
       loop: "{{ passwordless_sudo_users }}"
+      when:
+        - ansible_system != "Darwin"
+        - inventory_hostname != "homeassistant"
