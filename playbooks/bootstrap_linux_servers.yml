@@ -1,0 +1,113 @@
+---
+- name: Bootstrap Linux servers
+  hosts: all
+  become: true
+
+  vars:
+    extra_base_packages:
+      - tmux
+      - rsync
+
+    managed_users:
+      - bart
+      - jane
+      - root
+
+    passwordless_sudo_users:
+      - bart
+      - jane
+
+  tasks:
+    - name: Verzamel alle public key files op de Ansible-controller
+      ansible.builtin.set_fact:
+        public_key_files: "{{ lookup('ansible.builtin.fileglob', playbook_dir + '/../files/ssh-keys/*.pub', wantlist=True) }}"
+      when:
+        - ansible_os_family == "Debian"
+        - inventory_hostname != "homeassistant"
+
+    - name: Stop als er geen public keys gevonden zijn
+      ansible.builtin.fail:
+        msg: "Geen .pub bestanden gevonden in {{ playbook_dir }}/../files/ssh-keys/"
+      when:
+        - ansible_os_family == "Debian"
+        - inventory_hostname != "homeassistant"
+        - public_key_files | length == 0
+
+    - name: Installeer extra basispackages
+      ansible.builtin.apt:
+        name: "{{ extra_base_packages }}"
+        state: present
+        update_cache: true
+      when:
+        - ansible_os_family == "Debian"
+        - inventory_hostname != "homeassistant"
+
+    - name: Zorg dat gebruiker jane bestaat
+      ansible.builtin.user:
+        name: jane
+        state: present
+        shell: /bin/bash
+        create_home: true
+      when:
+        - ansible_os_family == "Debian"
+        - inventory_hostname != "homeassistant"
+
+    - name: Zorg dat .ssh map bestaat voor bart en jane
+      ansible.builtin.file:
+        path: "/home/{{ item }}/.ssh"
+        state: directory
+        owner: "{{ item }}"
+        group: "{{ item }}"
+        mode: "0700"
+      loop:
+        - bart
+        - jane
+      when:
+        - ansible_os_family == "Debian"
+        - inventory_hostname != "homeassistant"
+
+    - name: Zorg dat .ssh map bestaat voor root
+      ansible.builtin.file:
+        path: /root/.ssh
+        state: directory
+        owner: root
+        group: root
+        mode: "0700"
+      when:
+        - ansible_os_family == "Debian"
+        - inventory_hostname != "homeassistant"
+
+    - name: Voeg alle public keys toe voor bart, jane en root
+      ansible.posix.authorized_key:
+        user: "{{ item.0 }}"
+        state: present
+        key: "{{ lookup('ansible.builtin.file', item.1) }}"
+        manage_dir: false
+      loop: "{{ managed_users | product(public_key_files) | list }}"
+      when:
+        - ansible_os_family == "Debian"
+        - inventory_hostname != "homeassistant"
+
+    - name: Zorg dat /etc/sudoers.d bestaat
+      ansible.builtin.file:
+        path: /etc/sudoers.d
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+      when:
+        - ansible_os_family == "Debian"
+        - inventory_hostname != "homeassistant"
+
+    - name: Sta passwordless sudo toe voor bart en jane
+      ansible.builtin.copy:
+        dest: "/etc/sudoers.d/{{ item }}"
+        content: "{{ item }} ALL=(ALL) NOPASSWD:ALL\n"
+        owner: root
+        group: root
+        mode: "0440"
+        validate: "/usr/sbin/visudo -cf %s"
+      loop: "{{ passwordless_sudo_users }}"
+      when:
+        - ansible_os_family == "Debian"
+        - inventory_hostname != "homeassistant"
