@@ -22,7 +22,7 @@
 
     - name: Verzamel alle public key files op de Ansible-controller
       ansible.builtin.set_fact:
-        public_key_files: "{{ lookup('ansible.builtin.fileglob', playbook_dir + '../files/ssh-keys/*.pub', wantlist=True) }}"
+        public_key_files: "{{ lookup('ansible.builtin.fileglob', playbook_dir + '/../files/ssh-keys/*.pub', wantlist=True) }}"
 
     - name: Zorg dat .ssh map bestaat voor bart en jane
       ansible.builtin.file:
