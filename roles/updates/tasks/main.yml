@@ -1,0 +1,11 @@
+---
+- name: Update apt cache en voer upgrade uit
+  ansible.builtin.apt:
+    update_cache: true
+    upgrade: "{{ apt_upgrade_type }}"
+    cache_valid_time: 3600
+
+- name: Verwijder ongebruikte packages
+  ansible.builtin.apt:
+    autoremove: "{{ apt_autoremove }}"
+    autoclean: "{{ apt_autoclean }}"

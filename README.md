@@ -1,26 +1,31 @@
-# Ansible SSH key rollout
+# Ansible / AWX skeleton
 
-## Layout
-- `inventory.ini` — known hosts, using `bart` on the targets
-- `group_vars/all.yml` — user/key settings
-- `playbooks/authorized_keys.yml` — creates users, installs keys and configures passwordless sudo
-- `playbooks/bootstrap_ansible_key.yml` — installs the dedicated Ansible management key first
-- `files/ssh-keys/` — public keys used by the playbooks
+Kleine, nette starter voor AWX of lokale Ansible-runs.
 
-## Run on the control node
-The control node user is `ansible`.
-Use that account on the Ansible server and run from:
+## Inhoud
+- `playbooks/base.yml` – basispackages + timezone
+- `playbooks/users_ssh.yml` – users, groups en authorized keys
+- `playbooks/docker.yml` – officiële Docker CE installatie via Docker apt repo
+- `playbooks/node_exporter.yml` – Prometheus node_exporter als systemd service
+- `playbooks/updates.yml` – apt update/upgrade/autoremove/autoclean
+
+## Snel starten
+1. Pas inventory aan in `inventories/test/hosts.ini`
+2. Zet je SSH public key in `files/ssh/bart_id_ed25519.pub`
+3. Pas variabelen aan in `inventories/test/group_vars/*.yml`
+4. Test eerst op de test inventory
+
+Voorbeelden:
 ```bash
-cd /home/ansible/ansible
+ansible-playbook -i inventories/test/hosts.ini playbooks/base.yml
+ansible-playbook -i inventories/test/hosts.ini playbooks/users_ssh.yml
+ansible-playbook -i inventories/test/hosts.ini playbooks/docker.yml
+ansible-playbook -i inventories/test/hosts.ini playbooks/node_exporter.yml
+ansible-playbook -i inventories/test/hosts.ini playbooks/updates.yml
 ```
 
-### 1) Bootstrap the Ansible management key
-Use the already working SSH key first:
-```bash
-ansible-playbook -i inventory.ini playbooks/bootstrap_ansible_key.yml
-```
-
-### 2) Run the normal user/key playbook
-```bash
-ansible-playbook -i inventory.ini playbooks/authorized_keys.yml
-```
+## AWX tip
+- Maak 1 Project aan op basis van deze repo
+- Maak 2 inventories: `Test` en `Production`
+- Maak per playbook een apart Job Template
+- Gebruik in het begin eventueel een `Limit` op 1 host

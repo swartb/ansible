@@ -1,0 +1,6 @@
+---
+- import_playbook: playbooks/base.yml
+- import_playbook: playbooks/users_ssh.yml
+- import_playbook: playbooks/docker.yml
+- import_playbook: playbooks/node_exporter.yml
+- import_playbook: playbooks/updates.yml

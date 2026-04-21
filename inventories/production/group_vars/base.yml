@@ -1,0 +1,7 @@
+---
+common_packages:
+  - tmux
+  - rsync
+  - curl
+  - ca-certificates
+  - vim

@@ -1,0 +1,7 @@
+---
+- name: Voer updates uit
+  hosts: updates
+  become: true
+  gather_facts: true
+  roles:
+    - updates

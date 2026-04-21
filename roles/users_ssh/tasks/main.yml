@@ -1,0 +1,25 @@
+---
+- name: Zorg dat managed groups bestaan
+  ansible.builtin.group:
+    name: "{{ item.name }}"
+    system: "{{ item.system | default(false) }}"
+    state: present
+  loop: "{{ managed_groups }}"
+
+- name: Zorg dat managed users bestaan
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    comment: "{{ item.comment | default(omit) }}"
+    groups: "{{ item.groups | default(omit) }}"
+    append: true
+    shell: "{{ item.shell | default('/bin/bash') }}"
+    create_home: "{{ item.create_home | default(true) }}"
+    state: "{{ item.state | default('present') }}"
+  loop: "{{ managed_users }}"
+
+- name: Plaats authorized keys voor managed users
+  ansible.posix.authorized_key:
+    user: "{{ item.0.name }}"
+    key: "{{ lookup('file', item.1.file) }}"
+    state: present
+  loop: "{{ managed_users | subelements('authorized_keys', skip_missing=True) }}"

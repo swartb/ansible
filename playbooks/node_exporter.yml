@@ -1,0 +1,7 @@
+---
+- name: Installeer Prometheus node_exporter
+  hosts: node_exporter
+  become: true
+  gather_facts: true
+  roles:
+    - node_exporter

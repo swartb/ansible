@@ -1,0 +1,16 @@
+---
+managed_groups:
+  - name: admin
+    system: false
+
+managed_users:
+  - name: bart
+    comment: Bart
+    groups:
+      - sudo
+      - admin
+    shell: /bin/bash
+    create_home: true
+    state: present
+    authorized_keys:
+      - file: files/ssh/bart_id_ed25519.pub
