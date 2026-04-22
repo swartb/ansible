@@ -1,6 +1,6 @@
 ---
 - name: Beheer users en SSH keys
-  hosts: users_ssh
+  hosts: all_hosts
   become: true
   gather_facts: true
   roles:
