@@ -1,0 +1,6 @@
+---
+- name: Configureer tmux
+  hosts: linux
+  become: true
+  roles:
+    - tmux

@@ -1,0 +1,34 @@
+---
+- name: Installeer tmux
+  ansible.builtin.apt:
+    name: tmux
+    state: present
+    update_cache: true
+
+- name: Plaats globale tmux configuratie
+  ansible.builtin.copy:
+    dest: /etc/tmux.conf
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      # Meer normale scroll/muisbediening
+      set -g mouse on
+
+      # Meer scrollback
+      set -g history-limit 50000
+
+      # Snellere reactie op Escape / vi-achtige keys
+      set -sg escape-time 10
+
+      # Betere kleurondersteuning
+      set -g default-terminal "screen-256color"
+      set -ga terminal-overrides ",xterm-256color:Tc"
+
+      # Statusbalk iets rustiger dan felgroen
+      set -g status-style bg=default,fg=default
+      set -g status-left "[#S] "
+      set -g status-right "%H:%M %d-%m-%Y"
+
+      # Config herladen met Ctrl-b r
+      bind r source-file /etc/tmux.conf \; display-message "tmux config herladen"
