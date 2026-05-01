@@ -1,0 +1,37 @@
+---
+- name: Zorg dat ~/.ssh/config de ansible management key bevat
+  hosts: linux
+  gather_facts: true
+  become: false
+
+  vars:
+    ssh_config_path: "{{ ansible_env.HOME }}/.ssh/config"
+    ssh_dir_path: "{{ ansible_env.HOME }}/.ssh"
+
+    ansible_management_identity_file: "{{ ansible_env.HOME }}/.ssh/ansible_management_ed25519"
+
+    ssh_config_block: |
+      Host *
+          IdentityFile {{ ansible_management_identity_file }}
+          IdentitiesOnly yes
+
+  tasks:
+    - name: Zorg dat ~/.ssh directory bestaat
+      ansible.builtin.file:
+        path: "{{ ssh_dir_path }}"
+        state: directory
+        mode: "0700"
+
+    - name: Zorg dat ~/.ssh/config bestaat
+      ansible.builtin.file:
+        path: "{{ ssh_config_path }}"
+        state: touch
+        mode: "0600"
+
+    - name: Voeg ansible management SSH config toe als block
+      ansible.builtin.blockinfile:
+        path: "{{ ssh_config_path }}"
+        marker: "# {mark} ANSIBLE MANAGED BLOCK ansible_management_ed25519"
+        block: "{{ ssh_config_block }}"
+        create: true
+        mode: "0600"
