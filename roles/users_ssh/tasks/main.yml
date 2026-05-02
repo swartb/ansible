@@ -17,6 +17,26 @@
     state: "{{ item.state | default('present') }}"
   loop: "{{ managed_users }}"
 
+- name: Configureer passwordless sudo voor managed users
+  ansible.builtin.copy:
+    dest: "/etc/sudoers.d/{{ item.name }}"
+    content: "{{ item.name }} ALL=(ALL) NOPASSWD:ALL\n"
+    owner: root
+    group: root
+    mode: "0440"
+    validate: "/usr/sbin/visudo -cf %s"
+  loop: "{{ managed_users }}"
+  when:
+    - item.passwordless_sudo | default(false)
+
+- name: Verwijder passwordless sudo file als uitgeschakeld
+  ansible.builtin.file:
+    path: "/etc/sudoers.d/{{ item.name }}"
+    state: absent
+  loop: "{{ managed_users }}"
+  when:
+    - not (item.passwordless_sudo | default(false))
+
 - name: Zorg dat .ssh directory bestaat voor managed users met authorized_keys
   ansible.builtin.file:
     path: "/home/{{ item.name }}/.ssh"
