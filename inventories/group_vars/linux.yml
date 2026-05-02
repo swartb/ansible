@@ -13,7 +13,7 @@ managed_users:
     create_home: true
     state: present
     authorized_keys:
-      - file: /files/ssh/ansible_management.pub
+      - file: ansible_management.pub
 
   - name: hermes
     comment: hermes-agent
@@ -22,7 +22,8 @@ managed_users:
       - admin
     shell: /bin/bash
     create_home: true
+    state: present
     authorized_keys:
-      - file: /files/ssh/ansible_management.pub
+      - file: ansible_management.pub
       
        

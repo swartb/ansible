@@ -1,3 +1,4 @@
 ---
 managed_groups: []
 managed_users: []
+ssh_public_keys_base_path: "{{ playbook_dir }}/../files/ssh"

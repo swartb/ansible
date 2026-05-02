@@ -17,9 +17,36 @@
     state: "{{ item.state | default('present') }}"
   loop: "{{ managed_users }}"
 
+- name: Zorg dat .ssh directory bestaat voor managed users met authorized_keys
+  ansible.builtin.file:
+    path: "/home/{{ item.name }}/.ssh"
+    state: directory
+    owner: "{{ item.name }}"
+    group: "{{ item.name }}"
+    mode: "0700"
+  loop: "{{ managed_users }}"
+  when:
+    - item.authorized_keys is defined
+    - item.authorized_keys | length > 0
+    - item.name != 'root'
+
+- name: Zorg dat .ssh directory bestaat voor root met authorized_keys
+  ansible.builtin.file:
+    path: "/root/.ssh"
+    state: directory
+    owner: root
+    group: root
+    mode: "0700"
+  loop: "{{ managed_users }}"
+  when:
+    - item.authorized_keys is defined
+    - item.authorized_keys | length > 0
+    - item.name == 'root'
+
 - name: Plaats authorized keys voor managed users
   ansible.posix.authorized_key:
     user: "{{ item.0.name }}"
-    key: "{{ lookup('file', item.1.file) }}"
+    key: "{{ lookup('file', ssh_public_keys_base_path ~ '/' ~ item.1.file) }}"
     state: present
   loop: "{{ managed_users | subelements('authorized_keys', skip_missing=True) }}"
+  no_log: true
