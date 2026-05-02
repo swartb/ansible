@@ -1,4 +1,0 @@
----
-apt_upgrade_type: "dist"
-apt_autoremove: true
-apt_autoclean: true
