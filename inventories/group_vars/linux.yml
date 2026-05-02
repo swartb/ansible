@@ -12,6 +12,7 @@ managed_users:
     shell: /bin/bash
     create_home: true
     state: present
+    passwordless_sudo: true
     authorized_keys:
       - file: ansible_management.pub
 
@@ -23,6 +24,7 @@ managed_users:
     shell: /bin/bash
     create_home: true
     state: present
+    passwordless_sudo: true
     authorized_keys:
       - file: ansible_management.pub
       - file: hermes_agent.pub
