@@ -23,6 +23,6 @@ managed_users:
     shell: /bin/bash
     create_home: true
     authorized_keys:
-      -file: files/ssh/ansible_management_ed25519.pub
+      - file: files/ssh/ansible_management_ed25519.pub
       
        
