@@ -50,6 +50,10 @@ all:
         openclaw-agent:
           ansible_host: 192.168.2.21
           ansible_user: bart  
+        
+        hermes-main:
+          ansible_host: 192.168.2.30
+          ansible_user: bart 
           
         agents:
           ansible_host: 192.168.2.22
