@@ -1,0 +1,15 @@
+---
+# Pad naar de lokale private key (bijv. op de Ansible-controlnode)
+local_private_key_path: "/opt/secrets/gitkey/github-access"
+
+# Pad naar de doelhost waar de key moet worden gekopieerd
+remote_private_key_dest: "/home/bart/.ssh/github-access"
+
+# SSH-user op de doelhost (standaard: root)
+remote_user: "bart"
+
+# SSH-port (standaard: 22)
+ssh_port: 22
+
+# Pad naar de autorized_keys (optioneel)
+remote_authorized_keys_dest: "/home/bart/.ssh/authorized_keys"

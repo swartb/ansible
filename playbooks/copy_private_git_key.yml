@@ -1,0 +1,6 @@
+---
+- name: "Private key kopiëren naar doelhost met rol"
+  hosts: linux  # Of een specifieke groep, zoals "servers"
+  become: yes
+  roles:
+    - copy_private_key

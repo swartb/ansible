@@ -1,0 +1,63 @@
+---
+#- name: "Zorg ervoor dat de .ssh map bestaat op de doelhost"
+#  ansible.builtin.file:
+#    path: "{{ remote_private_key_dest | dirname }}"
+#    state: directory
+#    mode: '0700'
+#    owner: "{{ remote_user }}"
+#    group: "{{ remote_user }}"
+#  become: yes
+
+#- name: "Kopieer de private key naar de doelhost"
+#  ansible.builtin.copy:
+#    src: "{{ local_private_key_path }}"
+#    dest: "{{ remote_private_key_dest }}"
+#    mode: '0600'
+#    owner: "{{ remote_user }}"
+#    group: "{{ remote_user }}"
+#    backup: yes
+#  become: yes
+
+
+- name: Ensure ~/.ssh directory exists
+  file:
+    path: "{{ ansible_user_dir }}/.ssh"
+    state: directory
+    mode: '0700'
+
+- name: Copy private Git key to user's SSH directory
+  copy:
+    src: "{{ private_git_key_src }}"
+    dest: "{{ ansible_user_dir }}/.ssh/id_rsa"
+    mode: '0600'
+  when: private_git_key_src is defined
+
+- name: "Voeg de private key toe aan authorized_keys (optioneel)"
+  ansible.builtin.lineinfile:
+    path: "{{ remote_authorized_keys_dest }}"
+    line: "{{ lookup('file', local_private_key_path ~ '.pub') }}"
+    create: yes
+    mode: '0600'
+    owner: "{{ remote_user }}"
+    group: "{{ remote_user }}"
+    state: present
+  become: yes
+
+- name: Ensure SSH config file exists
+  file:
+    path: "{{ ansible_user_dir }}/.ssh/config"
+    state: touch
+    mode: '0644'
+
+- name: Configure SSH to use the private Git key for Git operations
+  blockinfile:
+    path: "{{ ansible_user_dir }}/.ssh/config"
+    block: |
+      Host git.example.com
+        HostName git.example.com
+        User git
+        IdentityFile {{ ansible_user_dir }}/.ssh/id_rsa
+        IdentitiesOnly yes
+    marker: "# {mark} ANSIBLE MANAGED BLOCK: SSH config for Git"
+    create: no
+  when: private_git_key_src is defined
