@@ -3,4 +3,4 @@
   hosts: linux  # Of een specifieke groep, zoals "servers"
   become: yes
   roles:
-    - copy_private_key
+    - copy_private_git_key
