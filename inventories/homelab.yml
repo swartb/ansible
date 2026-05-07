@@ -27,10 +27,6 @@ all:
           ansible_host: 192.168.2.15
           ansible_user: bart
 
-        bastion:
-          ansible_host: 192.168.2.16
-          ansible_user: bart
-
         unknown-vm:
           ansible_host: 192.168.2.17
           ansible_user: root
