@@ -1,7 +1,7 @@
 all:
   vars:
     ansible_ssh_private_key_file: /home/bart/.ssh/ansible_management_ed25519
-
+    
   children:
     linux:
       vars:
@@ -38,22 +38,18 @@ all:
         test-server:
           ansible_host: 192.168.2.19
           ansible_user: bart
-
+          
         openclaw-agent:
           ansible_host: 192.168.2.21
-          ansible_user: bart
-
-        agents:
-          ansible_host: 192.168.2.22
-          ansible_user: bart
-
+          ansible_user: bart  
+        
         hermes-main:
           ansible_host: 192.168.2.30
-          ansible_user: bart
-
-        hermes-control-node:
-          ansible_host: 192.168.2.253
-          ansible_user: bart
+          ansible_user: bart 
+          
+        agents:
+          ansible_host: 192.168.2.22
+          ansible_user: bart 
 
     docker:
       vars:
@@ -130,44 +126,3 @@ all:
         macbook:
           ansible_host: 192.168.2.70
           ansible_user: bartswart
-
-    beheer_servers:
-      hosts:
-        hermes-main:
-          ansible_host: 192.168.2.30
-          ansible_user: bart
-
-        personal-assistant:
-          ansible_host: 192.168.2.18
-          ansible_user: bart
-
-        macbook:
-          ansible_host: 192.168.2.70
-          ansible_user: bartswart
-
-        hermes-control-node:
-          ansible_host: 192.168.2.253
-          ansible_user: bart
-
-    github_access:
-      hosts:
-        hermes-main:
-          ansible_host: 192.168.2.30
-          ansible_user: bart
-
-        personal-assistant:
-          ansible_host: 192.168.2.18
-          ansible_user: bart
-
-        macbook:
-          ansible_host: 192.168.2.70
-          ansible_user: bartswart
-
-        hermes-control-node:
-          ansible_host: 192.168.2.253
-          ansible_user: bart
-
-        docker-host:
-          ansible_host: 192.168.2.13
-          ansible_user: bart
-          
