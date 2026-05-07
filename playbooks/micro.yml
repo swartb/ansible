@@ -1,0 +1,7 @@
+---
+- name: Installeer micro editor
+  hosts: linux
+  become: true
+  roles:
+    - micro
+    

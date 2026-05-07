@@ -1,0 +1,7 @@
+---
+- name: Installeer micro
+  ansible.builtin.apt:
+    name: micro
+    state: present
+    update_cache: true
+    

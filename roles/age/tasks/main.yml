@@ -1,0 +1,7 @@
+---
+- name: Installeer age
+  ansible.builtin.apt:
+    name: age
+    state: present
+    update_cache: true
+    
